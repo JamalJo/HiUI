@@ -18,7 +18,7 @@ import android.view.View;
 
 /**
  * Created by zhoumao on 2019/3/16.
- * Description:
+ * Description: 自定义View--刮刮卡 https://blog.csdn.net/qq_30716173/article/details/51122474
  */
 public class ScratchView extends View {
 
