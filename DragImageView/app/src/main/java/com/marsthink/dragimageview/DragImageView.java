@@ -29,11 +29,14 @@ public class DragImageView extends View {
     private float mStartX;
     private float mStartY;
 
+    private float mPreX;
+    private float mPreY;
+
     private float mEndX;
     private float mEndY;
 
-    private float mX;
-    private float mY;
+    private float mCenterX;
+    private float mCenterY;
 
     private double mBaseVal;
 
@@ -67,8 +70,8 @@ public class DragImageView extends View {
         mOriginWidth = mCurrentWidth;
         mOriginHeight = mCurrentHeight;
 
-        mX = mCurrentWidth / 2;
-        mY = mCurrentHeight / 2;
+        mCenterX = mCurrentWidth / 2;
+        mCenterY = mCurrentHeight / 2;
     }
 
     @Override
@@ -77,24 +80,29 @@ public class DragImageView extends View {
             case MotionEvent.ACTION_DOWN:
                 mStartX = event.getX();
                 mStartY = event.getY();
-                if (mStartX > mEndX - mCurrentWidth / 2 && mStartX < mEndX + mCurrentWidth / 2
-                        && mStartY > mEndY - mCurrentHeight / 2
-                        && mStartY < mEndY + mCurrentHeight / 2) {
+                mPreX = event.getX();
+                mPreY = event.getY();
+                if (mStartX > mCenterX - mCurrentWidth / 2 && mStartX < mCenterX + mCurrentWidth / 2
+                        && mStartY > mCenterY - mCurrentHeight / 2
+                        && mStartY < mCenterY + mCurrentHeight / 2) {
                     isStartValid = true;
+
                 }
                 mBaseVal = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (event.getPointerCount() == 1) {
                     if (isStartValid) {
-                        if (Math.abs(event.getX() - mStartX) > 3 || Math.abs(event.getY() - mStartY)
-                                > 3) {
-                            mX = event.getX();
-                            mY = event.getY();
-                            Log.d(TAG, "onTouchEvent: " + mX + " " + mY);
+                        if (Math.abs(event.getX() - mStartX) > 3
+                                || Math.abs(event.getY() - mStartY) > 3) {
+                            mCenterX = mCenterX + event.getX() - mPreX;
+                            mCenterY = mCenterY + event.getY() - mPreY;
+                            Log.d(TAG, "onTouchEvent: " + mCenterX + " " + mCenterY);
                             invalidate();
                         }
                     }
+                    mPreX = event.getX();
+                    mPreY = event.getY();
                 } else if (event.getPointerCount() == 2) {
                     float x = event.getX(0) - event.getX(1);
                     float y = event.getY(0) - event.getY(1);
@@ -138,11 +146,8 @@ public class DragImageView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-//        canvas.drawBitmap(mBitmap, mMatrix, null);
-        RectF destRectF = new RectF(mX - mCurrentWidth / 2, mY - mCurrentHeight / 2,
-                mX + mCurrentWidth / 2, mY + mCurrentHeight / 2);
-//        destRectF.scale();
+        RectF destRectF = new RectF(mCenterX - mCurrentWidth / 2, mCenterY - mCurrentHeight / 2,
+                mCenterX + mCurrentWidth / 2, mCenterY + mCurrentHeight / 2);
         canvas.drawBitmap(mBitmap, null, destRectF, null);
-//        canvas.drawBitmap(mBitmap, mX - mCurrentWidth / 2, mY - mCurrentHeight / 2, null);
     }
 }
