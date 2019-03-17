@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -19,11 +20,11 @@ public class DragImageView extends View {
 
     Bitmap mBitmap;
 
-    private int mOriginWidth;
-    private int mOriginHeight;
+    private float mOriginWidth;
+    private float mOriginHeight;
 
-    private int mCurrentWidth;
-    private int mCurrentHeight;
+    private float mCurrentWidth;
+    private float mCurrentHeight;
 
     private float mStartX;
     private float mStartY;
@@ -33,6 +34,10 @@ public class DragImageView extends View {
 
     private float mX;
     private float mY;
+
+    private double mBaseVal;
+
+    private double mOriginalVal;
 
     private boolean isStartValid = true;
 
@@ -52,12 +57,15 @@ public class DragImageView extends View {
         mOriginWidth = options.outWidth;
         mOriginHeight = options.outHeight;
         options.inJustDecodeBounds = false;
-        options.inSampleSize = 8;
+        options.inSampleSize = 4;
         options.inPreferredConfig = Bitmap.Config.RGB_565;
 
         mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.dog, options);
         mCurrentHeight = mBitmap.getHeight();
         mCurrentWidth = mBitmap.getWidth();
+
+        mOriginWidth = mCurrentWidth;
+        mOriginHeight = mCurrentHeight;
 
         mX = mCurrentWidth / 2;
         mY = mCurrentHeight / 2;
@@ -74,14 +82,28 @@ public class DragImageView extends View {
                         && mStartY < mEndY + mCurrentHeight / 2) {
                     isStartValid = true;
                 }
+                mBaseVal = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if (isStartValid) {
-                    if (Math.abs(event.getX() - mStartX) > 3 || Math.abs(event.getY() - mStartY)
-                            > 3) {
-                        mX = event.getX();
-                        mY = event.getY();
-                        Log.d(TAG, "onTouchEvent: " + mX + " " + mY);
+                if (event.getPointerCount() == 1) {
+                    if (isStartValid) {
+                        if (Math.abs(event.getX() - mStartX) > 3 || Math.abs(event.getY() - mStartY)
+                                > 3) {
+                            mX = event.getX();
+                            mY = event.getY();
+                            Log.d(TAG, "onTouchEvent: " + mX + " " + mY);
+                            invalidate();
+                        }
+                    }
+                } else if (event.getPointerCount() == 2) {
+                    float x = event.getX(0) - event.getX(1);
+                    float y = event.getY(0) - event.getY(1);
+                    double val = Math.sqrt(x * x + y * y);
+                    if (mBaseVal == 0) {
+                        mBaseVal = val;
+                    } else {
+                        float scale = (float) (val / mBaseVal);
+                        setScale(scale);
                         invalidate();
                     }
                 }
@@ -97,16 +119,30 @@ public class DragImageView extends View {
         return true;
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int height = getMeasuredWidth();
-        int width = getMeasuredWidth();
+    private void setScale(float scale) {
+        mCurrentWidth = mCurrentWidth * scale;
+
+        mCurrentHeight = mCurrentHeight * scale;
+
+        // 控制阈值，防止放大缩小过快；
+        if (mCurrentHeight / mOriginHeight > 2) {
+            mCurrentHeight = mOriginHeight * 2;
+            mCurrentWidth = mOriginWidth * 2;
+        }
+        if (mCurrentWidth / mOriginHeight < 0.5) {
+            mCurrentHeight = mOriginHeight * 0.5f;
+            mCurrentWidth = mOriginWidth * 0.5f;
+        }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawBitmap(mBitmap, mX - mCurrentWidth / 2, mY - mCurrentHeight / 2, null);
+//        canvas.drawBitmap(mBitmap, mMatrix, null);
+        RectF destRectF = new RectF(mX - mCurrentWidth / 2, mY - mCurrentHeight / 2,
+                mX + mCurrentWidth / 2, mY + mCurrentHeight / 2);
+//        destRectF.scale();
+        canvas.drawBitmap(mBitmap, null, destRectF, null);
+//        canvas.drawBitmap(mBitmap, mX - mCurrentWidth / 2, mY - mCurrentHeight / 2, null);
     }
 }
