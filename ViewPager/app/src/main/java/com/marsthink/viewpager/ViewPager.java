@@ -65,13 +65,14 @@ public class ViewPager extends ViewGroup {
                     mScroller.abortAnimation();
                 }
                 float mMoveVal = event.getX() - mLastX;
-                if (getScrollX() < 0) {
-                    mMoveVal = -getScrollX();
-                } else if (getScrollX() > getWidth() + mScreenWidth) {
-                    mMoveVal = getWidth() + mScreenWidth - getScrollX();
+                if (getScrollX() + mMoveVal < 0) {
+                    mMoveVal = 0;
+                } else if (getScrollX() + mMoveVal > getWidth() + mScreenWidth) {
+                    mMoveVal = 0;
                 }
                 scrollBy((int) mMoveVal, 0);
-//                mScroller.startScroll(getScrollX(),0,(int) mMoveVal,0);  // 为什么不能用这个实现？
+//                mScroller.startScroll(getScrollX(),0,(int) mMoveVal,0);  // 为什么不能用这个实现？  有duration
+                invalidate();
                 mLastX = event.getX();
                 break;
             case MotionEvent.ACTION_UP:
