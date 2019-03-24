@@ -18,7 +18,8 @@ public class MainActivity extends AppCompatActivity {
             "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553366731786&di"
                     + "=370ec242b7c694084501fd4d6491bccd&imgtype=0&src=http%3A%2F%2Fimg1.3lian"
                     + ".com%2F2015%2Fa1%2F149%2Fd%2F129.jpg",
-            "https://alissl.ucdl.pp.uc.cn/fs08/2019/03/20/6/2_d2807e6d3017563f890ee7a806919610.apk"
+            "https://alissl.ucdl.pp.uc.cn/fs08/2019/03/20/6/2_d2807e6d3017563f890ee7a806919610.apk",
+            "http://static.gaoshouyou.com/d/4b/d7/e04b308d9cd7f0ad4cac18d1a514544c.apk"
     };
 
 
@@ -36,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
         mDownLoadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String url = urls[3];
+                final String url = urls[1];
                 DownloadManager.getInstance().download(url, new DownloadListener() {
                     @Override
-                    public void onStart() {
+                    public void onStart(long totalBytes) {
                         Log.d(TAG, "#######onStart: " + url);
                     }
 
@@ -49,12 +50,12 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onRuning() {
-                        Log.d(TAG, "#######onRuning: " + url);
+                    public void onRuning(long curBytes, long totalBytes) {
+//                        Log.d(TAG, "#######onRuning: " + url);
                     }
 
                     @Override
-                    public void onComplete() {
+                    public void onComplete(String path) {
                         Log.d(TAG, "########onComplete: " + url);
                     }
                 });

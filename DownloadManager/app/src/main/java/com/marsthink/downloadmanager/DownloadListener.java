@@ -5,7 +5,10 @@ package com.marsthink.downloadmanager;
  * Description:
  */
 public abstract class DownloadListener {
-    public void onStart() {
+    public void onStart(long totalBytes) {
+    }
+
+    public void onWait() {
     }
 
     public void onStop() {
@@ -17,9 +20,9 @@ public abstract class DownloadListener {
     public void onFailed() {
     }
 
-    public void onComplete() {
+    public void onComplete(String destPath) {
     }
 
-    public void onRuning() {
+    public void onRuning(long curBytes, long totalBytes) {
     }
 }

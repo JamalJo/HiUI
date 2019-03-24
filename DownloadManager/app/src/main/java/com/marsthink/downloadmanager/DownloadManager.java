@@ -41,4 +41,9 @@ public class DownloadManager {
         this.download(downloadTask);
     }
 
+    public void download(String downLoadUrl, long start, long end,
+            DownloadListener downloadListener) {
+        DownloadTask downloadTask = new DownloadTask(downLoadUrl, downloadListener, start, end);
+        this.download(downloadTask);
+    }
 }

@@ -29,4 +29,6 @@ public class DownLoadConstants {
     @Retention(RetentionPolicy.SOURCE)
     @interface DownLoadState {
     }
+
+    public final static int DOWNLOAD_SPLIT = 5;
 }

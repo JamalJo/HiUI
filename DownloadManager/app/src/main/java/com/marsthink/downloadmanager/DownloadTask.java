@@ -18,13 +18,24 @@ public class DownloadTask extends AbsDownloadTask {
         mDownloadState = DownLoadConstants.START;
     }
 
+    public DownloadTask(String downloadUrl, DownloadListener downloadListener, long start,
+            long end) {
+        super();
+        mDownloadListener = downloadListener;
+        mDownloadUrl = downloadUrl;
+        mDownloadState = DownLoadConstants.START;
+        mStart = start;
+        mEnd = end;
+        isPartDownload = true;
+    }
+
     public DownloadTask(String downloadUrl, @DownLoadConstants.DownLoadState int downloadState) {
         mDownloadUrl = downloadUrl;
         mDownloadState = downloadState;
     }
 
     @Override
-    protected String getFileName() {
-        return MD5Util.md5(mDownloadUrl);
+    protected String getFilePath() {
+        return DownLoadConstants.DOWNLOAD_PATH + MD5Util.md5(mDownloadUrl);
     }
 }
