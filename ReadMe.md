@@ -7,3 +7,4 @@
 - FlowLayout
 - ViewPager
 - 左滑加载更多布局
+- 圆角的ReletiveLayout布局，裁剪子view到圆角；基于XferMode实现；
